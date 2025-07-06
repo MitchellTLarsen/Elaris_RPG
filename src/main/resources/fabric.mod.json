@@ -1,29 +1,29 @@
 {
 	"schemaVersion": 1,
-	"id": "elaris-rpg",
+	"id": "elaris",
 	"version": "${version}",
 	"name": "Elaris RPG",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"description": "",
 	"authors": [
 		"Me!"
 	],
 	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
+		"homepage": "",
+		"sources": ""
 	},
 	"license": "CC0-1.0",
-	"icon": "assets/elaris-rpg/icon.png",
+	"icon": "assets/elaris/icon.png",
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"net.elarisrpg.ElarisRPG"
+			"net.elaris.ElarisRPG"
 		],
 		"fabric-datagen": [
-			"net.elarisrpg.ElarisRPGDataGenerator"
+			"net.elaris.ElarisRPGDataGenerator"
 		]
 	},
 	"mixins": [
-		"elaris-rpg.mixins.json"
+		"elaris.mixins.json"
 	],
 	"depends": {
 		"fabricloader": ">=0.16.14",
