@@ -7,6 +7,7 @@ import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 
 public class ElarisRPGClient implements ClientModInitializer {
 
@@ -15,6 +16,7 @@ public class ElarisRPGClient implements ClientModInitializer {
 
         // Correctly register keybinds
         ElarisRPGKeyBinds.register();
+        net.elaris.client.render.MobHealthRender.register();
 
         // Use the keybind from the keybinds class
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
@@ -31,27 +33,59 @@ public class ElarisRPGClient implements ClientModInitializer {
         HudRenderCallback.EVENT.register((drawContext, tickDelta) -> {
             MinecraftClient mc = MinecraftClient.getInstance();
             PlayerEntity player = mc.player;
-            if (player != null) {
+
+            if (player != null && !player.isCreative() && !player.isSpectator()) {
                 LevelInfo info = PlayerData.get(player);
 
                 float progress = (float) info.getXp() / info.xpToNextLevel();
 
+                Identifier VANILLA_ICONS = new Identifier("minecraft", "textures/gui/icons.png");
+
                 int barWidth = 182;
-                int filled = (int)(progress * barWidth);
+                int barHeight = 5;
 
-                int x = (mc.getWindow().getScaledWidth() / 2) - (barWidth / 2);
-                int y = mc.getWindow().getScaledHeight() - 50;
+                int filled = (int) (progress * barWidth);
 
-                drawContext.fill(x, y, x + barWidth, y + 5, 0xFF555555);
-                drawContext.fill(x, y, x + filled, y + 5, 0xFF00FF00);
+                int screenWidth = mc.getWindow().getScaledWidth();
+                int screenHeight = mc.getWindow().getScaledHeight();
 
-                drawContext.drawText(
+                int barX = (screenWidth - barWidth) / 2;
+                int barY = screenHeight - 28;
+
+                // Draw vanilla XP bar background
+                drawContext.drawTexture(
+                        VANILLA_ICONS,
+                        barX,
+                        barY,
+                        0, 64,
+                        barWidth,
+                        barHeight,
+                        256, 256
+                );
+
+                if (filled > 0) {
+                    drawContext.drawTexture(
+                            VANILLA_ICONS,
+                            barX,
+                            barY,
+                            0, 69,
+                            filled,
+                            barHeight,
+                            256, 256
+                    );
+                }
+
+                String levelStr = String.valueOf(info.getLevel());
+                int levelTextWidth = mc.textRenderer.getWidth(levelStr);
+                int levelX = (screenWidth - levelTextWidth) / 2;
+                int levelY = barY - 9;
+
+                drawContext.drawTextWithShadow(
                         mc.textRenderer,
-                        Text.literal("Level " + info.getLevel()),
-                        x,
-                        y - 10,
-                        0xFFFFFF,
-                        true
+                        Text.literal(levelStr),
+                        levelX,
+                        levelY,
+                        0x80FF20
                 );
             }
         });
