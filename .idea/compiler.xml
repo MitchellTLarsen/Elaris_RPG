@@ -4,9 +4,9 @@
     <bytecodeTargetLevel target="17" />
   </component>
   <component name="JavacSettings">
-    <option name="ADDITIONAL_OPTIONS_STRING" value="-AoutRefMapFile=C:\Users\mitch\OneDrive\Desktop\Dev\Elaris_RPG\build\classes\java\main\elaris-rpg-refmap.json -AdefaultObfuscationEnv=named:intermediary -Aquiet=true -AoutMapFileNamedIntermediary=C:\Users\mitch\OneDrive\Desktop\Dev\Elaris_RPG\build\loom-cache\mixin-map-net.fabricmc.yarn.1_20_1.1.20.1+build.10-v2.main.tiny -AinMapFileNamedIntermediary=C:\Users\mitch\.gradle\caches\fabric-loom\1.20.1\net.fabricmc.yarn.1_20_1.1.20.1+build.10-v2\mappings.tiny" />
+    <option name="ADDITIONAL_OPTIONS_STRING" value="-AoutRefMapFile=C:\Users\mitch\OneDrive\Desktop\Dev\Elaris_RPG\build\classes\java\main\elaris-refmap.json -AdefaultObfuscationEnv=named:intermediary -Aquiet=true -AoutMapFileNamedIntermediary=C:\Users\mitch\OneDrive\Desktop\Dev\Elaris_RPG\build\loom-cache\mixin-map-net.fabricmc.yarn.1_20_1.1.20.1+build.10-v2.main.tiny -AinMapFileNamedIntermediary=C:\Users\mitch\.gradle\caches\fabric-loom\1.20.1\net.fabricmc.yarn.1_20_1.1.20.1+build.10-v2\mappings.tiny" />
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="Elaris_RPG.test" options="-AoutRefMapFile=C:\Users\mitch\OneDrive\Desktop\Dev\Elaris_RPG\build\classes\java\test\test-elaris-rpg-refmap.json -AdefaultObfuscationEnv=named:intermediary -Aquiet=true -AoutMapFileNamedIntermediary=C:\Users\mitch\OneDrive\Desktop\Dev\Elaris_RPG\build\loom-cache\mixin-map-net.fabricmc.yarn.1_20_1.1.20.1+build.10-v2.test.tiny -AinMapFileNamedIntermediary=C:\Users\mitch\.gradle\caches\fabric-loom\1.20.1\net.fabricmc.yarn.1_20_1.1.20.1+build.10-v2\mappings.tiny" />
+      <module name="Elaris_RPG.test" options="-AoutRefMapFile=C:\Users\mitch\OneDrive\Desktop\Dev\Elaris_RPG\build\classes\java\test\test-elaris-refmap.json -AdefaultObfuscationEnv=named:intermediary -Aquiet=true -AoutMapFileNamedIntermediary=C:\Users\mitch\OneDrive\Desktop\Dev\Elaris_RPG\build\loom-cache\mixin-map-net.fabricmc.yarn.1_20_1.1.20.1+build.10-v2.test.tiny -AinMapFileNamedIntermediary=C:\Users\mitch\.gradle\caches\fabric-loom\1.20.1\net.fabricmc.yarn.1_20_1.1.20.1+build.10-v2\mappings.tiny" />
     </option>
   </component>
 </project>

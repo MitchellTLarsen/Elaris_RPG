@@ -20,6 +20,9 @@
 		],
 		"fabric-datagen": [
 			"net.elaris.ElarisRPGDataGenerator"
+		],
+		"client": [
+			"net.elaris.ElarisRPGClient"
 		]
 	},
 	"mixins": [
