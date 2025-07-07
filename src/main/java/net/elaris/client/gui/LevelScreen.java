@@ -2,6 +2,7 @@ package net.elaris.client.gui;
 
 import net.elaris.LevelInfo;
 import net.elaris.PlayerData;
+import net.elaris.ElarisRPGKeyBinds;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -9,6 +10,9 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.Text;
 
 public class LevelScreen extends Screen {
+
+    private static final int BOX_WIDTH = 200;
+    private static final int BOX_HEIGHT = 100;
 
     public LevelScreen() {
         super(Text.literal("Elaris RPG Level Screen"));
@@ -21,34 +25,58 @@ public class LevelScreen extends Screen {
         MinecraftClient client = MinecraftClient.getInstance();
         PlayerEntity player = client.player;
 
+        int boxX = (this.width - BOX_WIDTH) / 2;
+        int boxY = (this.height - BOX_HEIGHT) / 2;
+
+        // Draw a semi-transparent gray box like vanilla menus
+        int backgroundColor = 0xAA000000; // translucent black
+        int borderColor = 0xFFAAAAAA; // light gray border
+
+        // Draw outer border
+        drawContext.fill(boxX - 2, boxY - 2, boxX + BOX_WIDTH + 2, boxY + BOX_HEIGHT + 2, borderColor);
+
+        // Draw inner background
+        drawContext.fill(boxX, boxY, boxX + BOX_WIDTH, boxY + BOX_HEIGHT, backgroundColor);
+
         if (player != null) {
             LevelInfo info = PlayerData.get(player);
 
             int centerX = this.width / 2;
-            int centerY = this.height / 2;
 
+            // Title
             drawContext.drawCenteredTextWithShadow(
                     this.textRenderer,
-                    "Elaris RPG",
+                    "Character Information",
                     centerX,
-                    centerY - 40,
+                    boxY + 10,
                     0xFFFFFF
             );
 
+            // Level
             drawContext.drawCenteredTextWithShadow(
                     this.textRenderer,
                     "Level: " + info.getLevel(),
                     centerX,
-                    centerY - 20,
+                    boxY + 30,
                     0x00FF00
             );
 
+            // XP
             drawContext.drawCenteredTextWithShadow(
                     this.textRenderer,
                     "XP: " + info.getXp() + " / " + info.xpToNextLevel(),
                     centerX,
-                    centerY,
+                    boxY + 50,
                     0xFFFF00
+            );
+
+            // Skill Points
+            drawContext.drawCenteredTextWithShadow(
+                    this.textRenderer,
+                    "Skill Points: " + info.getSkillPoints(),
+                    centerX,
+                    boxY + 70,
+                    0x66CCFF
             );
         }
 
@@ -62,7 +90,7 @@ public class LevelScreen extends Screen {
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (net.elaris.ElarisRPGKeyBinds.OPEN_LEVEL_SCREEN.matchesKey(keyCode, scanCode)) {
+        if (ElarisRPGKeyBinds.OPEN_LEVEL_SCREEN.matchesKey(keyCode, scanCode)) {
             this.close();
             return true;
         }
