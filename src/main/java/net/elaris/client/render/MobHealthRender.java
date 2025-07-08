@@ -5,13 +5,11 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.*;
-
-import java.util.List;
+import net.elaris.util.RaycastUtils;
 
 public class MobHealthRender {
 
@@ -24,7 +22,7 @@ public class MobHealthRender {
 
             float tickDelta = context.tickDelta();
 
-            LivingEntity mob = findLookedAtMob(player, 16.0);
+            LivingEntity mob = RaycastUtils.findLookedAtMob(player, 16.0);
             if (mob == null) return;
 
             float maxHealth = Math.max(1, mob.getMaxHealth());
@@ -92,44 +90,6 @@ public class MobHealthRender {
             immediate.draw();
             matrices.pop();
         });
-    }
-
-    private static LivingEntity findLookedAtMob(PlayerEntity player, double maxDistance) {
-        MinecraftClient client = MinecraftClient.getInstance();
-        LivingEntity closestMob = null;
-        double closestDot = -1.0;
-
-        Vec3d eyePos = player.getCameraPosVec(1.0f);
-        Vec3d lookVec = player.getRotationVec(1.0f);
-
-        assert client.world != null;
-        List<LivingEntity> entities = client.world.getEntitiesByClass(
-                LivingEntity.class,
-                player.getBoundingBox().expand(maxDistance),
-                entity -> !(entity instanceof PlayerEntity) && !isBoss(entity)
-        );
-
-        for (LivingEntity mob : entities) {
-            Vec3d toEntity = mob.getPos().add(0, mob.getHeight() * 0.5, 0).subtract(eyePos);
-            double distance = toEntity.length();
-
-            if (distance > maxDistance) continue;
-
-            Vec3d toEntityNorm = toEntity.normalize();
-            double dot = lookVec.dotProduct(toEntityNorm);
-
-            if (dot > 0.99 && dot > closestDot) {
-                closestDot = dot;
-                closestMob = mob;
-            }
-        }
-        return closestMob;
-    }
-
-    private static boolean isBoss(LivingEntity mob) {
-        return mob.getType() == EntityType.ENDER_DRAGON
-                || mob.getType() == EntityType.WITHER
-                || mob.getType() == EntityType.WARDEN;
     }
 
     private static void drawRect(VertexConsumerProvider.Immediate immediate, MatrixStack.Entry entry,

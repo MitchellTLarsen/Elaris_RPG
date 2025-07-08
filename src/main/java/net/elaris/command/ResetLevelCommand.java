@@ -3,7 +3,8 @@ package net.elaris.command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
-import net.elaris.LevelInfo;
+import net.elaris.LevelData;
+import net.elaris.PlayerClassData;
 import net.elaris.PlayerData;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.entity.player.PlayerEntity;
@@ -37,8 +38,11 @@ public class ResetLevelCommand {
         if (target.equalsIgnoreCase("all")) {
             Collection<? extends PlayerEntity> players = source.getServer().getPlayerManager().getPlayerList();
             for (PlayerEntity player : players) {
-                LevelInfo info = PlayerData.get(player);
-                info.reset();
+                PlayerClassData classData = PlayerData.get(player).getClassData();
+                classData.reset();
+
+                LevelData levelData = PlayerData.get(player).getLevelData();
+                levelData.reset(player);
             }
 
             source.sendFeedback(
@@ -53,8 +57,11 @@ public class ResetLevelCommand {
                 return 0;
             }
 
-            LevelInfo info = PlayerData.get(player);
-            info.reset();
+            PlayerClassData classData = PlayerData.get(player).getClassData();
+            classData.reset();
+
+            LevelData levelData = PlayerData.get(player).getLevelData();
+            levelData.reset(player);
 
             source.sendFeedback(
                     () -> Text.literal("[Elaris RPG] Reset levels for " + player.getEntityName()),
@@ -68,8 +75,11 @@ public class ResetLevelCommand {
         ServerCommandSource source = context.getSource();
 
         for (PlayerEntity player : players) {
-            LevelInfo info = PlayerData.get(player);
-            info.reset();
+            PlayerClassData classData = PlayerData.get(player).getClassData();
+            classData.reset();
+
+            LevelData levelData = PlayerData.get(player).getLevelData();
+            levelData.reset(player);
         }
 
         source.sendFeedback(

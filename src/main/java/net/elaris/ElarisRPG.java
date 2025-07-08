@@ -1,5 +1,6 @@
 package net.elaris;
 
+import net.elaris.command.ResetClassCommand;
 import net.elaris.command.ResetLevelCommand;
 import net.fabricmc.api.ModInitializer;
 
@@ -19,20 +20,27 @@ public class ElarisRPG implements ModInitializer {
 		ElarisRPG.LOGGER.info("Elaris RPG loaded!");
 
 		CommandRegistrationCallback.EVENT.register(
+				(dispatcher, registryAccess, environment) -> ResetLevelCommand.register(dispatcher)
+		);
+		CommandRegistrationCallback.EVENT.register(
 				(dispatcher, registryAccess, environment) -> {
 					ResetLevelCommand.register(dispatcher);
+					ResetClassCommand.register(dispatcher);
 				}
 		);
 
 		ServerEntityCombatEvents.AFTER_KILLED_OTHER_ENTITY.register((world, entity, killedEntity) -> {
 			if (entity instanceof PlayerEntity player) {
-				LevelInfo info = PlayerData.get(player);
-				info.addXp(20);
-//				player.sendMessage(
-//						Text.literal("You gained 20 XP. Level: " + info.getLevel()),
-//						false
-//				);
+				LevelData levelData = PlayerData.get(player).getLevelData();
+				levelData.addXp(player, 20);
+
+				// Optional message:
+				// player.sendMessage(
+				//     Text.literal("You gained 20 XP. Level: " + levelData.getLevel()),
+				//     false
+				// );
 			}
 		});
+
 	}
 }

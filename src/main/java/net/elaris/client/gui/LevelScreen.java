@@ -1,6 +1,6 @@
 package net.elaris.client.gui;
 
-import net.elaris.LevelInfo;
+import net.elaris.LevelData;
 import net.elaris.PlayerData;
 import net.elaris.ElarisRPGKeyBinds;
 import net.minecraft.client.MinecraftClient;
@@ -39,7 +39,7 @@ public class LevelScreen extends Screen {
         drawContext.fill(boxX, boxY, boxX + BOX_WIDTH, boxY + BOX_HEIGHT, backgroundColor);
 
         if (player != null) {
-            LevelInfo info = PlayerData.get(player);
+            LevelData info = PlayerData.get(player).getLevelData();
 
             int centerX = this.width / 2;
 
