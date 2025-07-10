@@ -10,12 +10,16 @@ import net.minecraft.util.math.Vec3d;
 
 public class MobOutlineUtils {
 
-    public static void renderEntityOutline(LivingEntity entity, MatrixStack matrices, Vec3d cameraPos) {
+    public static void renderEntityOutline(LivingEntity entity, MatrixStack matrices, Vec3d cameraPos, float tickDelta) {
         matrices.push();
 
-        double x = entity.getX() - cameraPos.x;
-        double y = entity.getY() - cameraPos.y;
-        double z = entity.getZ() - cameraPos.z;
+        double interpolatedX = entity.prevX + (entity.getX() - entity.prevX) * tickDelta;
+        double interpolatedY = entity.prevY + (entity.getY() - entity.prevY) * tickDelta;
+        double interpolatedZ = entity.prevZ + (entity.getZ() - entity.prevZ) * tickDelta;
+
+        double x = interpolatedX - cameraPos.x;
+        double y = interpolatedY - cameraPos.y;
+        double z = interpolatedZ - cameraPos.z;
 
         matrices.translate(x, y, z);
 

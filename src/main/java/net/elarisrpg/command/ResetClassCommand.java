@@ -2,6 +2,7 @@ package net.elarisrpg.command;
 
 import com.mojang.brigadier.CommandDispatcher;
 import net.elarisrpg.data.PlayerData;
+import net.elarisrpg.util.ClassItemUtils;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -20,6 +21,8 @@ public class ResetClassCommand {
                                 PlayerData.get(player).getClassData().reset();
 
                                 PlayerData.set(player, PlayerData.get(player));
+
+                                ClassItemUtils.removeClassItems(player);
 
                                 player.sendMessage(
                                         Text.literal("[Elaris RPG] Your class has been reset."),

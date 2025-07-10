@@ -14,7 +14,7 @@ public class MobOutlineRenderer {
 
             var mob = RaycastUtils.findLookedAtMob(player, 16.0);
             if (mob != null) {
-                MobOutlineUtils.renderEntityOutline(mob, context.matrixStack(), context.camera().getPos());
+                MobOutlineUtils.renderEntityOutline(mob, context.matrixStack(), context.camera().getPos(), context.tickDelta());
             }
         });
     }

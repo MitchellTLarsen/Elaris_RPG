@@ -42,7 +42,7 @@ public class ResetLevelCommand {
                 classData.reset();
 
                 LevelData levelData = PlayerData.get(player).getLevelData();
-                levelData.reset(player);
+                levelData.reset();
             }
 
             source.sendFeedback(
@@ -61,7 +61,7 @@ public class ResetLevelCommand {
             classData.reset();
 
             LevelData levelData = PlayerData.get(player).getLevelData();
-            levelData.reset(player);
+            levelData.reset();
 
             source.sendFeedback(
                     () -> Text.literal("[Elaris RPG] Reset levels for " + player.getEntityName()),
@@ -79,7 +79,7 @@ public class ResetLevelCommand {
             classData.reset();
 
             LevelData levelData = PlayerData.get(player).getLevelData();
-            levelData.reset(player);
+            levelData.reset();
         }
 
         source.sendFeedback(

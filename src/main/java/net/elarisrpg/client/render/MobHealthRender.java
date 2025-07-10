@@ -81,8 +81,7 @@ public class MobHealthRender {
         VertexConsumerProvider.Immediate immediate = client.getBufferBuilders().getEntityVertexConsumers();
         MatrixStack.Entry entry = matrices.peek();
 
-        Text text = Text.literal(mob.getDisplayName().getString() +
-                " [" + (int)health + "/" + (int)maxHealth + "]");
+        Text text = Text.literal(mob.getDisplayName().getString());
 
         int textWidth = client.textRenderer.getWidth(text);
         int barWidth = Math.max(100, textWidth + 10);

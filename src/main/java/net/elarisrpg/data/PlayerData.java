@@ -7,17 +7,12 @@ import org.jetbrains.annotations.NotNull;
 import java.util.HashMap;
 import java.util.UUID;
 
-public class PlayerData {
+public class PlayerData implements NbtSerializable {
 
     private static final HashMap<UUID, PlayerData> dataMap = new HashMap<>();
 
-    private final LevelData levelData;
-    private final PlayerClassData classData;
-
-    public PlayerData() {
-        this.levelData = new LevelData();
-        this.classData = new PlayerClassData();
-    }
+    private final LevelData levelData = new LevelData();
+    private final PlayerClassData classData = new PlayerClassData();
 
     public LevelData getLevelData() {
         return levelData;
@@ -27,9 +22,7 @@ public class PlayerData {
         return classData;
     }
 
-    /**
-     * Save this PlayerData into a compound.
-     */
+    @Override
     public void writeNbt(NbtCompound nbt) {
         NbtCompound levelNbt = new NbtCompound();
         levelData.writeNbt(levelNbt);
@@ -40,9 +33,7 @@ public class PlayerData {
         nbt.put("ElarisClassData", classNbt);
     }
 
-    /**
-     * Load this PlayerData from a compound.
-     */
+    @Override
     public void readNbt(NbtCompound nbt) {
         if (nbt.contains("ElarisLevelData")) {
             levelData.readNbt(nbt.getCompound("ElarisLevelData"));
