@@ -12,17 +12,17 @@
 		"sources": ""
 	},
 	"license": "CC0-1.0",
-	"icon": "assets/elaris/icon.png",
+	"icon": "assets/elarisrpg/icon.png",
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"net.elaris.ElarisRPG"
+			"net.elarisrpg.ElarisRPG"
 		],
 		"fabric-datagen": [
-			"net.elaris.ElarisRPGDataGenerator"
+			"net.elarisrpg.data.ElarisRPGDataGenerator"
 		],
 		"client": [
-			"net.elaris.ElarisRPGClient"
+			"net.elarisrpg.ElarisRPGClient"
 		]
 	},
 	"mixins": [
