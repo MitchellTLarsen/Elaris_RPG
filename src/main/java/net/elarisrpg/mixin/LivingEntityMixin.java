@@ -1,7 +1,7 @@
 package net.elarisrpg.mixin;
 
 // Import our custom networking class for sending packets from server → client
-import net.elarisrpg.ElarisServerNetworking;
+import net.elarisrpg.ElarisNetworking;
 
 // Import Minecraft classes used in the mixin
 import net.minecraft.entity.LivingEntity;
@@ -68,7 +68,7 @@ public class LivingEntityMixin {
                 // This allows the client to display things like:
                 // - health bars
                 // - damage numbers
-                ElarisServerNetworking.sendMobHitPacket(
+                ElarisNetworking.sendMobHitPacket(
                         player,
                         entity.getId(),
                         amount

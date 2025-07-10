@@ -22,10 +22,7 @@ public class ElarisRPG implements ModInitializer {
 	public void onInitialize() {
 
 		ElarisRPG.LOGGER.info("Elaris RPG loaded!");
-
-		CommandRegistrationCallback.EVENT.register(
-				(dispatcher, registryAccess, environment) -> ResetLevelCommand.register(dispatcher)
-		);
+		
 		CommandRegistrationCallback.EVENT.register(
 				(dispatcher, registryAccess, environment) -> {
 					ResetLevelCommand.register(dispatcher);
