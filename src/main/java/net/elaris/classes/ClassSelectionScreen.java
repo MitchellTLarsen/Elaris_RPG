@@ -1,6 +1,6 @@
 package net.elaris.classes;
 
-import net.elaris.PlayerData;
+import net.elaris.data.PlayerData;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;

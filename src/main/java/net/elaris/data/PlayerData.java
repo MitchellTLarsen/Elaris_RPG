@@ -1,4 +1,4 @@
-package net.elaris;
+package net.elaris.data;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;

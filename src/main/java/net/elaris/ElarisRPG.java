@@ -2,6 +2,10 @@ package net.elaris;
 
 import net.elaris.command.ResetClassCommand;
 import net.elaris.command.ResetLevelCommand;
+import net.elaris.command.SetClassCommand;
+import net.elaris.command.SetLevelCommand;
+import net.elaris.data.LevelData;
+import net.elaris.data.PlayerData;
 import net.fabricmc.api.ModInitializer;
 
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
@@ -26,6 +30,8 @@ public class ElarisRPG implements ModInitializer {
 				(dispatcher, registryAccess, environment) -> {
 					ResetLevelCommand.register(dispatcher);
 					ResetClassCommand.register(dispatcher);
+					SetLevelCommand.register(dispatcher);
+					SetClassCommand.register(dispatcher);
 				}
 		);
 
@@ -33,12 +39,6 @@ public class ElarisRPG implements ModInitializer {
 			if (entity instanceof PlayerEntity player) {
 				LevelData levelData = PlayerData.get(player).getLevelData();
 				levelData.addXp(player, 20);
-
-				// Optional message:
-				// player.sendMessage(
-				//     Text.literal("You gained 20 XP. Level: " + levelData.getLevel()),
-				//     false
-				// );
 			}
 		});
 

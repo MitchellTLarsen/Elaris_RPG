@@ -1,7 +1,7 @@
 package net.elaris.command;
 
 import com.mojang.brigadier.CommandDispatcher;
-import net.elaris.PlayerData;
+import net.elaris.data.PlayerData;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;

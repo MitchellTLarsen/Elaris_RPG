@@ -1,7 +1,7 @@
 package net.elaris.client.gui;
 
-import net.elaris.LevelData;
-import net.elaris.PlayerData;
+import net.elaris.data.LevelData;
+import net.elaris.data.PlayerData;
 import net.elaris.ElarisRPGKeyBinds;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
