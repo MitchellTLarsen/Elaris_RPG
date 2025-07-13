@@ -2,16 +2,13 @@ package net.elarisrpg.client.gui;
 
 import net.elarisrpg.classes.ElarisClasses;
 import net.elarisrpg.classes.PlayerClass;
-import net.elarisrpg.data.PlayerData;
-import net.elarisrpg.util.ClassItemUtils;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
+
 import java.util.List;
 
 public class ClassSelectionScreen extends Screen {
@@ -51,29 +48,13 @@ public class ClassSelectionScreen extends Screen {
     private void confirmSelection() {
         if (selectedClass == null) return;
 
-        PlayerEntity player = MinecraftClient.getInstance().player;
-        assert player != null;
+        var buf = net.fabricmc.fabric.api.networking.v1.PacketByteBufs.create();
+        buf.writeString(selectedClass.getName());
 
-        // Clean out previous class items
-        ClassItemUtils.removeClassItems(player);
-
-        PlayerData data = PlayerData.get(player);
-        data.getClassData().setPlayerClass(selectedClass.getName());
-
-        for (ItemStack original : selectedClass.getStartingItems()) {
-            ItemStack copy = original.copy();
-            ClassItemUtils.tagAsClassItem(copy);
-
-            // Find an empty slot
-            for (int i = 0; i < player.getInventory().size(); i++) {
-                if (player.getInventory().getStack(i).isEmpty()) {
-                    player.getInventory().setStack(i, copy);
-                    break;
-                }
-            }
-        }
-
-        player.playerScreenHandler.sendContentUpdates();
+        net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking.send(
+                net.elarisrpg.ElarisNetworking.CHOOSE_CLASS_PACKET,
+                buf
+        );
 
         close();
     }

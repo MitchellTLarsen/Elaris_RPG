@@ -1,13 +1,13 @@
 package net.elarisrpg.classes;
 
+import net.elarisrpg.classes.classskill.Skill;
+import net.elarisrpg.classes.classskill.SkillRow;
+import net.elarisrpg.classes.classskill.SkillTree;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.Identifier;
 
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ElarisClasses {
 
@@ -21,7 +21,8 @@ public class ElarisClasses {
                 List.of(
                         new ItemStack(Items.IRON_SWORD),
                         new ItemStack(Items.IRON_CHESTPLATE)
-                )
+                ),
+                createWarriorSkillTree()
         ));
 
         register(new PlayerClass(
@@ -31,7 +32,8 @@ public class ElarisClasses {
                 List.of(
                         new ItemStack(Items.BLAZE_ROD),
                         new ItemStack(Items.LEATHER_HELMET)
-                )
+                ),
+                createElementalistSkillTree()
         ));
 
         register(new PlayerClass(
@@ -42,7 +44,8 @@ public class ElarisClasses {
                         new ItemStack(Items.BOW),
                         new ItemStack(Items.LEATHER_CHESTPLATE),
                         new ItemStack(Items.ARROW, 16)
-                )
+                ),
+                createRangerSkillTree()
         ));
 
         register(new PlayerClass(
@@ -52,7 +55,8 @@ public class ElarisClasses {
                 List.of(
                         new ItemStack(Items.STONE_SWORD),
                         new ItemStack(Items.LEATHER_BOOTS)
-                )
+                ),
+                createRougeSkillTree()
         ));
     }
 
@@ -73,5 +77,69 @@ public class ElarisClasses {
                 .filter(pc -> pc.getName().equalsIgnoreCase(name))
                 .findFirst()
                 .orElse(null);
+    }
+
+    private static SkillTree createWarriorSkillTree() {
+        List<SkillRow> rows = new ArrayList<>();
+        for (int r = 1; r <= 4; r++) {
+            List<Skill> skills = new ArrayList<>();
+            for (int s = 1; s <= 5; s++) {
+                skills.add(new Skill(
+                        "Warrior Skill " + s,
+                        "Warrior-specific description for skill " + s + " in row " + r,
+                        5
+                ));
+            }
+            rows.add(new SkillRow(skills));
+        }
+        return new SkillTree(rows);
+    }
+
+    private static SkillTree createRangerSkillTree() {
+        List<SkillRow> rows = new ArrayList<>();
+        for (int r = 1; r <= 4; r++) {
+            List<Skill> skills = new ArrayList<>();
+            for (int s = 1; s <= 5; s++) {
+                skills.add(new Skill(
+                        "Ranger Skill " + s,
+                        "Ranger-specific description for skill " + s + " in row " + r,
+                        5
+                ));
+            }
+            rows.add(new SkillRow(skills));
+        }
+        return new SkillTree(rows);
+    }
+
+    private static SkillTree createElementalistSkillTree() {
+        List<SkillRow> rows = new ArrayList<>();
+        for (int r = 1; r <= 4; r++) {
+            List<Skill> skills = new ArrayList<>();
+            for (int s = 1; s <= 5; s++) {
+                skills.add(new Skill(
+                        "Elementalist Skill " + s,
+                        "Elementalist-specific description for skill " + s + " in row " + r,
+                        5
+                ));
+            }
+            rows.add(new SkillRow(skills));
+        }
+        return new SkillTree(rows);
+    }
+
+    private static SkillTree createRougeSkillTree() {
+        List<SkillRow> rows = new ArrayList<>();
+        for (int r = 1; r <= 4; r++) {
+            List<Skill> skills = new ArrayList<>();
+            for (int s = 1; s <= 5; s++) {
+                skills.add(new Skill(
+                        "Rouge Skill " + s,
+                        "Rouge-specific description for skill " + s + " in row " + r,
+                        5
+                ));
+            }
+            rows.add(new SkillRow(skills));
+        }
+        return new SkillTree(rows);
     }
 }
