@@ -1,99 +1,58 @@
 package net.elarisrpg.client.gui;
 
+import io.github.cottonmc.cotton.gui.client.LightweightGuiDescription;
+import io.github.cottonmc.cotton.gui.widget.*;
+import io.github.cottonmc.cotton.gui.widget.data.Axis;
+import io.github.cottonmc.cotton.gui.widget.data.HorizontalAlignment;
+import io.github.cottonmc.cotton.gui.widget.data.Insets;
 import net.elarisrpg.data.LevelData;
 import net.elarisrpg.data.PlayerData;
-import net.elarisrpg.ElarisRPGKeyBinds;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.Text;
 
-public class LevelScreen extends Screen {
-
-    private static final int BOX_WIDTH = 200;
-    private static final int BOX_HEIGHT = 100;
+public class LevelScreen extends LightweightGuiDescription {
 
     public LevelScreen() {
-        super(Text.literal("Elaris RPG Level Screen"));
-    }
+        PlayerEntity player = MinecraftClient.getInstance().player;
 
-    @Override
-    public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
-        this.renderBackground(drawContext);
+        // Measure the pixel width of the title
+        String desiredTitle = "Character Information";
+        int titleWidth = MinecraftClient.getInstance()
+                .textRenderer
+                .getWidth(Text.literal(desiredTitle));
 
-        MinecraftClient client = MinecraftClient.getInstance();
-        PlayerEntity player = client.player;
+        int desiredWidth = titleWidth + 40;
 
-        int boxX = (this.width - BOX_WIDTH) / 2;
-        int boxY = (this.height - BOX_HEIGHT) / 2;
+        WBox root = new WBox(Axis.VERTICAL);
+        setRootPanel(root);
+        root.setInsets(new Insets(8));
+        root.setSpacing(4);
+        root.setSize(desiredWidth, 0);
 
-        // Draw a semi-transparent gray box like vanilla menus
-        int backgroundColor = 0xAA000000; // translucent black
-        int borderColor = 0xFFAAAAAA; // light gray border
-
-        // Draw outer border
-        drawContext.fill(boxX - 2, boxY - 2, boxX + BOX_WIDTH + 2, boxY + BOX_HEIGHT + 2, borderColor);
-
-        // Draw inner background
-        drawContext.fill(boxX, boxY, boxX + BOX_WIDTH, boxY + BOX_HEIGHT, backgroundColor);
+        WLabel title = new WLabel(Text.literal(desiredTitle));
+        title.setHorizontalAlignment(HorizontalAlignment.LEFT);
+        root.add(title);
 
         if (player != null) {
             LevelData info = PlayerData.get(player).getLevelData();
 
-            int centerX = this.width / 2;
+            WLabel levelLabel = new WLabel(Text.literal("Level: " + info.getLevel()));
+            levelLabel.setColor(0x00FF00);
+            root.add(levelLabel);
 
-            // Title
-            drawContext.drawCenteredTextWithShadow(
-                    this.textRenderer,
-                    "Character Information",
-                    centerX,
-                    boxY + 10,
-                    0xFFFFFF
-            );
+            WLabel xpLabel = new WLabel(Text.literal("XP: " + info.getXp() + " / " + info.xpToNextLevel()));
+            xpLabel.setColor(0xFFFF00);
+            root.add(xpLabel);
 
-            // Level
-            drawContext.drawCenteredTextWithShadow(
-                    this.textRenderer,
-                    "Level: " + info.getLevel(),
-                    centerX,
-                    boxY + 30,
-                    0x00FF00
-            );
-
-            // XP
-            drawContext.drawCenteredTextWithShadow(
-                    this.textRenderer,
-                    "XP: " + info.getXp() + " / " + info.xpToNextLevel(),
-                    centerX,
-                    boxY + 50,
-                    0xFFFF00
-            );
-
-            // Skill Points
-            drawContext.drawCenteredTextWithShadow(
-                    this.textRenderer,
-                    "Skill Points: " + info.getSkillPoints(),
-                    centerX,
-                    boxY + 70,
-                    0x66CCFF
-            );
+            WLabel skillLabel = new WLabel(Text.literal("Skill Points: " + info.getSkillPoints()));
+            skillLabel.setColor(0x66CCFF);
+            root.add(skillLabel);
+        } else {
+            WLabel errorLabel = new WLabel(Text.literal("Player not found"));
+            root.add(errorLabel);
         }
 
-        super.render(drawContext, mouseX, mouseY, delta);
-    }
-
-    @Override
-    public boolean shouldPause() {
-        return false;
-    }
-
-    @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (ElarisRPGKeyBinds.OPEN_LEVEL_SCREEN.matchesKey(keyCode, scanCode)) {
-            this.close();
-            return true;
-        }
-        return super.keyPressed(keyCode, scanCode, modifiers);
+        root.validate(this);
     }
 }

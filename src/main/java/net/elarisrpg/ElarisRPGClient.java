@@ -6,6 +6,7 @@ import net.elarisrpg.client.ElarisHud;
 import net.elarisrpg.client.HitMobTracker;
 import net.elarisrpg.client.gui.ClassSelectionScreen;
 import net.elarisrpg.client.gui.LevelScreen;
+import net.elarisrpg.client.gui.LibGuiHelper;
 import net.elarisrpg.client.overlay.XpBarOverlay;
 import net.elarisrpg.client.render.MobHealthRender;
 import net.elarisrpg.client.render.MobOutlineRenderer;
@@ -79,12 +80,13 @@ public class ElarisRPGClient implements ClientModInitializer {
             // Process keybind to open/close Level Screen
             // -----------------------------------------------------------
             while (ElarisRPGKeyBinds.OPEN_LEVEL_SCREEN.wasPressed()) {
-                if (client.currentScreen instanceof LevelScreen) {
+                if (client.currentScreen instanceof LibGuiHelper) {
                     client.setScreen(null);
                 } else {
-                    client.setScreen(new LevelScreen());
+                    client.setScreen(new LibGuiHelper(LevelScreen::new));
                 }
             }
+
             while (ElarisRPGKeyBinds.OPEN_SKILL_TREE.wasPressed()) {
                 if (client.player != null) {
                     var playerData = net.elarisrpg.data.PlayerData.get(client.player);
@@ -124,7 +126,7 @@ public class ElarisRPGClient implements ClientModInitializer {
             }
 
             if (!triedToOpenClassScreen && client.currentScreen == null) {
-                client.setScreen(new ClassSelectionScreen());
+                client.setScreen(new LibGuiHelper(ClassSelectionScreen::new));
                 triedToOpenClassScreen = true;
             }
         });
@@ -140,6 +142,7 @@ public class ElarisRPGClient implements ClientModInitializer {
                     float damage = buf.readFloat();
 
                     client.execute(() -> {
+                        assert client.world != null;
                         var entity = client.world.getEntityById(entityId);
                         if (entity instanceof LivingEntity living) {
                             HitMobTracker.markMobHit(entityId);
