@@ -1,5 +1,6 @@
 package net.elarisrpg.classes;
 
+import net.elarisrpg.classes.classskill.SkillTree;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 
@@ -10,12 +11,14 @@ public class PlayerClass {
     private final String name;
     private final String description;
     private final List<ItemStack> startingItems;
+    private final SkillTree skillTree;
 
-    public PlayerClass(Identifier id, String name, String description, List<ItemStack> startingItems) {
+    public PlayerClass(Identifier id, String name, String description, List<ItemStack> startingItems, SkillTree skillTree) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.startingItems = startingItems;
+        this.skillTree = skillTree;
     }
 
     public Identifier getId() {
@@ -33,4 +36,5 @@ public class PlayerClass {
     public List<ItemStack> getStartingItems() {
         return startingItems;
     }
+
 }

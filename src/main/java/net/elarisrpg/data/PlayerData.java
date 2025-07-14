@@ -1,5 +1,8 @@
 package net.elarisrpg.data;
 
+import net.elarisrpg.classes.classskill.Skill;
+import net.elarisrpg.classes.classskill.SkillRow;
+import net.elarisrpg.classes.classskill.SkillTree;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import org.jetbrains.annotations.NotNull;
@@ -13,6 +16,11 @@ public class PlayerData implements NbtSerializable {
 
     private final LevelData levelData = new LevelData();
     private final PlayerClassData classData = new PlayerClassData();
+    private final SkillTree skillTree;
+
+    public PlayerData() {
+        this.skillTree = createDefaultSkillTree();
+    }
 
     public LevelData getLevelData() {
         return levelData;
@@ -20,6 +28,14 @@ public class PlayerData implements NbtSerializable {
 
     public PlayerClassData getClassData() {
         return classData;
+    }
+
+    public SkillTree getSkillTree() {
+        return skillTree;
+    }
+
+    public int getTotalSkillPoints() {
+        return levelData.getSkillPoints();
     }
 
     @Override
@@ -31,6 +47,9 @@ public class PlayerData implements NbtSerializable {
         NbtCompound classNbt = new NbtCompound();
         classData.writeNbt(classNbt);
         nbt.put("ElarisClassData", classNbt);
+
+        NbtCompound skillTreeNbt = skillTree.writeNbt();
+        nbt.put("ElarisSkillTree", skillTreeNbt);
     }
 
     @Override
@@ -40,6 +59,9 @@ public class PlayerData implements NbtSerializable {
         }
         if (nbt.contains("ElarisClassData")) {
             classData.readNbt(nbt.getCompound("ElarisClassData"));
+        }
+        if (nbt.contains("ElarisSkillTree")) {
+            skillTree.readNbt(nbt.getCompound("ElarisSkillTree"));
         }
     }
 
@@ -53,5 +75,22 @@ public class PlayerData implements NbtSerializable {
 
     public static void remove(@NotNull PlayerEntity player) {
         dataMap.remove(player.getUuid());
+    }
+
+    private SkillTree createDefaultSkillTree() {
+        var rows = new java.util.ArrayList<SkillRow>();
+
+        for (int r = 1; r <= 4; r++) {
+            var skills = new java.util.ArrayList<Skill>();
+            for (int s = 1; s <= 5; s++) {
+                skills.add(new Skill(
+                        "Skill " + s,
+                        "Description for skill " + s + " in row " + r,
+                        5
+                ));
+            }
+            rows.add(new SkillRow(skills));
+        }
+        return new SkillTree(rows);
     }
 }

@@ -1,21 +1,18 @@
 package net.elarisrpg;
 
 // Imports from your mod
-import net.elarisrpg.client.gui.ClassSelectionScreen;
+
 import net.elarisrpg.client.ElarisHud;
 import net.elarisrpg.client.HitMobTracker;
+import net.elarisrpg.client.gui.ClassSelectionScreen;
 import net.elarisrpg.client.gui.LevelScreen;
 import net.elarisrpg.client.overlay.XpBarOverlay;
-import net.elarisrpg.client.render.MobOutlineRenderer;
 import net.elarisrpg.client.render.MobHealthRender;
-
-// Fabric API imports
+import net.elarisrpg.client.render.MobOutlineRenderer;
 import net.elarisrpg.data.PlayerData;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-
-// Minecraft classes
 import net.minecraft.entity.LivingEntity;
 
 public class ElarisRPGClient implements ClientModInitializer {
@@ -86,6 +83,12 @@ public class ElarisRPGClient implements ClientModInitializer {
                     client.setScreen(null);
                 } else {
                     client.setScreen(new LevelScreen());
+                }
+            }
+            while (ElarisRPGKeyBinds.OPEN_SKILL_TREE.wasPressed()) {
+                if (client.player != null) {
+                    var playerData = net.elarisrpg.data.PlayerData.get(client.player);
+                    client.setScreen(new net.elarisrpg.client.gui.SkillTreeScreen(playerData));
                 }
             }
 
