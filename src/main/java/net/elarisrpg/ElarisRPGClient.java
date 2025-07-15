@@ -8,6 +8,8 @@ import net.elarisrpg.client.gui.ClassSelectionScreen;
 import net.elarisrpg.client.gui.LevelScreen;
 import net.elarisrpg.client.gui.LibGuiHelper;
 import net.elarisrpg.client.overlay.XpBarOverlay;
+import net.elarisrpg.client.render.DamagePopup;
+import net.elarisrpg.client.render.DamagePopupManager;
 import net.elarisrpg.client.render.MobHealthRender;
 import net.elarisrpg.client.render.MobOutlineRenderer;
 import net.elarisrpg.data.PlayerData;
@@ -15,6 +17,8 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.text.Text;
+import net.minecraft.util.math.Vec3d;
 
 public class ElarisRPGClient implements ClientModInitializer {
 
@@ -129,6 +133,8 @@ public class ElarisRPGClient implements ClientModInitializer {
                 client.setScreen(new LibGuiHelper(ClassSelectionScreen::new));
                 triedToOpenClassScreen = true;
             }
+
+            DamagePopupManager.tick();
         });
 
         // ----------------------------------------------------------------------------------------------------
@@ -146,6 +152,15 @@ public class ElarisRPGClient implements ClientModInitializer {
                         var entity = client.world.getEntityById(entityId);
                         if (entity instanceof LivingEntity living) {
                             HitMobTracker.markMobHit(entityId);
+
+                            Vec3d popupPos = living.getPos()
+                                    .add(0, living.getHeight() + 0.5, 0);
+
+                            DamagePopupManager.addPopup(new DamagePopup(
+                                    Text.literal(String.format("-%.1f", damage)),
+                                    popupPos,
+                                    0xFFEE3333 // bright red
+                            ));
                         }
                     });
                 }

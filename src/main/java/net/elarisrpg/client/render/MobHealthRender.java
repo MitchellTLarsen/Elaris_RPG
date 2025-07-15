@@ -11,33 +11,36 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.*;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 public class MobHealthRender {
+
+    public static final Identifier BAR_SPRITESHEET = new Identifier("elarisrpg", "textures/gui/healthbars.png");
 
     public static void register() {
         WorldRenderEvents.AFTER_ENTITIES.register(context -> {
             MinecraftClient client = MinecraftClient.getInstance();
             PlayerEntity player = client.player;
-
             if (player == null) return;
 
             float tickDelta = context.tickDelta();
 
-            // Gather all mobs to render bars for
             Set<LivingEntity> mobsToRender = new HashSet<>();
 
-            // Mob being looked at
+            // Mob the player is looking at
             LivingEntity lookedAt = RaycastUtils.findLookedAtMob(player, 16.0);
             if (lookedAt != null) {
                 mobsToRender.add(lookedAt);
             }
 
-            // Recently hit mobs from server sync
+            // Recently hit mobs
             for (int entityId : HitMobTracker.getActiveMobs()) {
-                assert client.world != null;
+                if (client.world == null) continue;
                 var entity = client.world.getEntityById(entityId);
                 if (entity instanceof LivingEntity mob && mob.isAlive()) {
                     renderHealthBarAboveMob(context, mob, tickDelta);
@@ -47,6 +50,10 @@ public class MobHealthRender {
             for (LivingEntity mob : mobsToRender) {
                 renderHealthBarAboveMob(context, mob, tickDelta);
             }
+
+            client.getBufferBuilders().getEntityVertexConsumers().draw();
+
+            renderDamagePopups(context);
         });
     }
 
@@ -82,23 +89,23 @@ public class MobHealthRender {
         MatrixStack.Entry entry = matrices.peek();
 
         Text text = Text.literal(mob.getDisplayName().getString());
-
         int textWidth = client.textRenderer.getWidth(text);
-        int barWidth = Math.max(100, textWidth + 10);
-        int barHeight = 5;
-
-        int segments = 10;
-        int segmentWidth = barWidth / segments;
+        int barWidth = Math.max(64, textWidth + 10);
+        int barHeight = 8;
 
         int x = -barWidth / 2;
         int y = 0;
 
-        for (int i = 0; i < segments; i++) {
-            int segX = x + i * segmentWidth;
-            boolean filled = (i + 1) <= (healthRatio * segments);
-            int color = filled ? 0xFFAA0000 : 0xFF333333;
-            drawRect(immediate, entry, segX, y, segmentWidth - 1, barHeight, color);
-            drawRectBorder(immediate, entry, segX, y, segmentWidth - 1, barHeight, 0xFFAAAAAA);
+        // Draw background bar slightly forward
+        drawTexture(immediate, entry, BAR_SPRITESHEET, x, y,
+                barWidth, barHeight,
+                0, 5, 64, 64, 0.01f);
+
+        int filledWidth = (int) (barWidth * healthRatio);
+        if (filledWidth > 0) {
+            drawTexture(immediate, entry, BAR_SPRITESHEET, x, y,
+                    filledWidth, barHeight,
+                    1, 5, 64, 64, 0f);
         }
 
         client.textRenderer.draw(
@@ -118,44 +125,108 @@ public class MobHealthRender {
         matrices.pop();
     }
 
-    private static void drawRect(VertexConsumerProvider.Immediate immediate, MatrixStack.Entry entry,
-                                 int x, int y, int width, int height, int color) {
-        float a = (float)((color >> 24) & 255) / 255.0F;
-        float r = (float)((color >> 16) & 255) / 255.0F;
-        float g = (float)((color >> 8) & 255) / 255.0F;
-        float b = (float)(color & 255) / 255.0F;
-
-        VertexConsumer vc = immediate.getBuffer(RenderLayer.getGui());
-        vc.vertex(entry.getPositionMatrix(), x, y, 0).color(r, g, b, a).next();
-        vc.vertex(entry.getPositionMatrix(), x, y + height, 0).color(r, g, b, a).next();
-        vc.vertex(entry.getPositionMatrix(), x + width, y + height, 0).color(r, g, b, a).next();
-        vc.vertex(entry.getPositionMatrix(), x + width, y, 0).color(r, g, b, a).next();
-    }
-
-    private static void drawRectBorder(VertexConsumerProvider.Immediate immediate, MatrixStack.Entry entry,
-                                       int x, int y, int width, int height, int color) {
-        drawRect(immediate, entry, x, y, width, 1, color);
-        drawRect(immediate, entry, x, y + height - 1, width, 1, color);
-        drawRect(immediate, entry, x, y, 1, height, color);
-        drawRect(immediate, entry, x + width - 1, y, 1, height, color);
-    }
-
-    public static LivingEntity findEntityByUuid(UUID uuid) {
+    private static void renderDamagePopups(WorldRenderContext context) {
         MinecraftClient client = MinecraftClient.getInstance();
-        if (client.world == null) return null;
+        MatrixStack matrices = context.matrixStack();
+        VertexConsumerProvider.Immediate immediate = client.getBufferBuilders().getEntityVertexConsumers();
 
-        Box infiniteBox = new Box(
-                Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY,
-                Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY
-        );
+        Iterator<DamagePopup> iter = DamagePopupManager.getPopups().iterator();
+        while (iter.hasNext()) {
+            DamagePopup popup = iter.next();
+            popup.tick();
 
-        for (LivingEntity entity : client.world.getEntitiesByClass(
-                LivingEntity.class,
-                infiniteBox,
-                e -> e.getUuid().equals(uuid)
-        )) {
-            return entity;
+            if (popup.isExpired()) {
+                iter.remove();
+                continue;
+            }
+
+            Vec3d pos = popup.position;
+            matrices.push();
+
+            matrices.translate(
+                    pos.x - context.camera().getPos().x,
+                    pos.y - context.camera().getPos().y,
+                    pos.z - context.camera().getPos().z
+            );
+
+            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-context.camera().getYaw()));
+            matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(context.camera().getPitch()));
+            float scale = 0.02f;
+            matrices.scale(-scale, -scale, scale);
+
+            TextRenderer renderer = client.textRenderer;
+            float fade = popup.getAlpha();
+            int alpha = (int)(fade * 255);
+            int fadedColor = (alpha << 24) | (popup.color & 0xFFFFFF);
+
+            renderer.draw(
+                    popup.text,
+                    -renderer.getWidth(popup.text) / 2f,
+                    0,
+                    fadedColor,
+                    false,
+                    matrices.peek().getPositionMatrix(),
+                    immediate,
+                    TextRenderer.TextLayerType.NORMAL,
+                    0,
+                    15728880
+            );
+
+            matrices.pop();
         }
-        return null;
+
+        immediate.draw();
+    }
+
+    private static void drawTexture(
+            VertexConsumerProvider.Immediate immediate,
+            MatrixStack.Entry entry,
+            Identifier texture,
+            int x, int y,
+            int width, int height,
+            int rowIndex,
+            int spriteHeight,
+            int textureWidth,
+            int textureHeight,
+            float z
+    ) {
+        VertexConsumer vc = immediate.getBuffer(RenderLayer.getEntityTranslucent(texture));
+
+        float u0 = 0.0f;
+        float u1 = (float) width / (float) textureWidth;
+        float v0 = (rowIndex * spriteHeight) / (float) textureHeight;
+        float v1 = ((rowIndex + 1) * spriteHeight) / (float) textureHeight;
+
+        vc.vertex(entry.getPositionMatrix(), x, y, z)
+                .color(255, 255, 255, 255)
+                .texture(u0, v0)
+                .overlay(OverlayTexture.DEFAULT_UV)
+                .light(0x00F000F0)
+                .normal(0, 0, 1)
+                .next();
+
+        vc.vertex(entry.getPositionMatrix(), x, y + height, z)
+                .color(255, 255, 255, 255)
+                .texture(u0, v1)
+                .overlay(OverlayTexture.DEFAULT_UV)
+                .light(0x00F000F0)
+                .normal(0, 0, 1)
+                .next();
+
+        vc.vertex(entry.getPositionMatrix(), x + width, y + height, z)
+                .color(255, 255, 255, 255)
+                .texture(u1, v1)
+                .overlay(OverlayTexture.DEFAULT_UV)
+                .light(0x00F000F0)
+                .normal(0, 0, 1)
+                .next();
+
+        vc.vertex(entry.getPositionMatrix(), x + width, y, z)
+                .color(255, 255, 255, 255)
+                .texture(u1, v0)
+                .overlay(OverlayTexture.DEFAULT_UV)
+                .light(0x00F000F0)
+                .normal(0, 0, 1)
+                .next();
     }
 }
