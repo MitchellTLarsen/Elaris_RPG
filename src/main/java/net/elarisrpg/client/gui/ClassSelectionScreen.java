@@ -1,128 +1,147 @@
 package net.elarisrpg.client.gui;
 
+import io.github.cottonmc.cotton.gui.client.LightweightGuiDescription;
+import io.github.cottonmc.cotton.gui.widget.*;
+import io.github.cottonmc.cotton.gui.widget.data.Axis;
+import io.github.cottonmc.cotton.gui.widget.data.HorizontalAlignment;
+import io.github.cottonmc.cotton.gui.widget.data.Insets;
+import io.github.cottonmc.cotton.gui.widget.icon.ItemIcon;
 import net.elarisrpg.classes.ElarisClasses;
 import net.elarisrpg.classes.PlayerClass;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.ButtonWidget;
+import net.elarisrpg.ElarisNetworking;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.ItemStack;
-import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 
-import java.util.List;
+public class ClassSelectionScreen extends LightweightGuiDescription {
 
-public class ClassSelectionScreen extends Screen {
-
-    private final List<PlayerClass> classes;
     private PlayerClass selectedClass;
 
+    private final WLabel classNameLabel = new WLabel(Text.literal(""));
+    private final WLabel descriptionLabel = new WLabel(Text.literal(""));
+    private WBox iconBox = new WBox(Axis.VERTICAL);
+    private final WButton confirmButton = new WButton(Text.literal("Confirm"));
+    private WBox rightBox;
+    private WBox buttonBox;
+    private WBox root;
+
+    private int uiWidth;
+
     public ClassSelectionScreen() {
-        super(Text.literal("Select Your Class"));
-        this.classes = List.copyOf(ElarisClasses.getAll());
+        buildUi();
     }
 
-    @Override
-    protected void init() {
-        int y = 40;
-        int x = 20;
+    private void buildUi() {
+        MinecraftClient client = MinecraftClient.getInstance();
 
-        for (PlayerClass pc : classes) {
-            addDrawableChild(ButtonWidget.builder(
-                    Text.literal(pc.getName()),
-                    btn -> selectClass(pc)
-            ).position(x, y).size(120, 20).build());
+        int windowWidth = client.getWindow().getScaledWidth();
+        int windowHeight = client.getWindow().getScaledHeight();
 
-            y += 24;
+        uiWidth = (int) (windowWidth * 0.7);
+        int rightPanelWidth = uiWidth / 2;
+
+        // Root panel is now vertical
+        root = new WBox(Axis.VERTICAL);
+        setRootPanel(root);
+        root.setInsets(new Insets(8));
+        root.setSpacing(12);
+        root.setSize(uiWidth, 0);
+
+        // Horizontal row for main content
+        WBox contentRow = new WBox(Axis.HORIZONTAL);
+        contentRow.setSpacing(12);
+        root.add(contentRow);
+
+        // LEFT: class buttons
+        buttonBox = new WBox(Axis.VERTICAL);
+        buttonBox.setSpacing(4);
+
+        for (PlayerClass pc : ElarisClasses.getAll()) {
+            WButton clickable = new WButton(new ItemIcon(pc.getIconItem())) {
+                @Override
+                public void addTooltip(TooltipBuilder builder) {
+                    builder.add(Text.literal(pc.getName()), Text.literal(pc.getDescription()));
+                }
+            };
+            clickable.setOnClick(() -> selectClass(pc));
+            buttonBox.add(clickable, 20, 20);
         }
 
-        addDrawableChild(ButtonWidget.builder(
-                Text.literal("Confirm"),
-                btn -> confirmSelection()
-        ).position(width - 140, height - 40).size(120, 20).build());
+        contentRow.add(buttonBox);
+
+        // RIGHT: details
+        rightBox = new WBox(Axis.VERTICAL);
+        rightBox.setSpacing(8);
+        rightBox.setInsets(new Insets(8));
+        rightBox.setSize(rightPanelWidth, 0);
+
+        classNameLabel.setHorizontalAlignment(HorizontalAlignment.LEFT);
+        rightBox.add(classNameLabel);
+
+        rightBox.add(iconBox);
+
+        descriptionLabel.setHorizontalAlignment(HorizontalAlignment.LEFT);
+        rightBox.add(descriptionLabel);
+
+        contentRow.add(rightBox);
+
+        // Bottom bar for confirm button
+        String label = "Confirm";
+        int textWidth = MinecraftClient.getInstance().textRenderer.getWidth(label);
+        int desiredWidth = textWidth + 20;
+
+        confirmButton.setOnClick(this::confirmSelection);
+        confirmButton.setEnabled(false);
+
+        WBox bottomBar = new WBox(Axis.HORIZONTAL);
+        bottomBar.setHorizontalAlignment(HorizontalAlignment.LEFT);
+        bottomBar.add(confirmButton, desiredWidth, 20);
+        root.add(bottomBar);
+
+        root.validate(this);
     }
 
     private void selectClass(PlayerClass pc) {
         this.selectedClass = pc;
+
+        classNameLabel.setText(Text.literal(pc.getName()));
+        descriptionLabel.setText(Text.literal(pc.getDescription()));
+
+        // Create new iconBox
+        WBox newIconBox = new WBox(Axis.HORIZONTAL);
+        for (ItemStack stack : pc.getStartingItems()) {
+            WItem item = new WItem(stack);
+            newIconBox.add(item);
+        }
+
+        rightBox.remove(iconBox);
+        rightBox.add(newIconBox);
+        iconBox = newIconBox;
+
+        confirmButton.setEnabled(true);
+
+        getRootPanel().validate(this);
     }
 
     private void confirmSelection() {
         if (selectedClass == null) return;
 
-        var buf = net.fabricmc.fabric.api.networking.v1.PacketByteBufs.create();
+        var buf = PacketByteBufs.create();
         buf.writeString(selectedClass.getName());
+        ClientPlayNetworking.send(ElarisNetworking.CHOOSE_CLASS_PACKET, buf);
 
-        net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking.send(
-                net.elarisrpg.ElarisNetworking.CHOOSE_CLASS_PACKET,
-                buf
-        );
-
-        close();
+        MinecraftClient.getInstance().setScreen(null);
     }
 
+    private void recalculateLayout(int windowWidth, int windowHeight) {
+        uiWidth = (int) (windowWidth * 0.7);
+        int rightPanelWidth = uiWidth / 2;
 
-    @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        this.renderBackground(context);
+        root.setSize(uiWidth, 0);
+        rightBox.setSize(rightPanelWidth, 0);
 
-        if (selectedClass != null) {
-            int panelX = width / 2 + 20;
-            int panelY = 40;
-
-            // Draw class name
-            context.drawText(
-                    textRenderer,
-                    Text.literal(selectedClass.getName()),
-                    panelX,
-                    panelY,
-                    0xFFFFFF,
-                    false
-            );
-
-            panelY += 20;
-
-            // Draw starting equipment icons vertically
-            int itemX = panelX;
-            int itemY = panelY;
-
-            for (ItemStack stack : selectedClass.getStartingItems()) {
-                context.drawItem(stack, itemX, itemY);
-
-                boolean isHovered =
-                        mouseX >= itemX &&
-                                mouseX < itemX + 16 &&
-                                mouseY >= itemY &&
-                                mouseY < itemY + 16;
-
-                if (isHovered) {
-                    context.drawItemTooltip(
-                            textRenderer,
-                            stack,
-                            mouseX,
-                            mouseY
-                    );
-                }
-
-                itemY += 18;
-            }
-
-            // Description panel
-            int descriptionX = panelX + 20;
-            int maxDescriptionWidth = width - descriptionX - 20;
-
-            List<OrderedText> wrappedLines = textRenderer.wrapLines(
-                    Text.literal(selectedClass.getDescription()),
-                    maxDescriptionWidth
-            );
-
-            int descY = panelY;
-            for (OrderedText line : wrappedLines) {
-                context.drawText(textRenderer, line, descriptionX, descY, 0xAAAAAA, false);
-                descY += textRenderer.fontHeight + 2;
-            }
-        }
-
-        super.render(context, mouseX, mouseY, delta);
+        getRootPanel().validate(this);
     }
-
-
 }

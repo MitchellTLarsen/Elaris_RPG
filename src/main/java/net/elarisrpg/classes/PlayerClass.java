@@ -12,13 +12,15 @@ public class PlayerClass {
     private final String description;
     private final List<ItemStack> startingItems;
     private final SkillTree skillTree;
+    private final ItemStack iconItem;
 
-    public PlayerClass(Identifier id, String name, String description, List<ItemStack> startingItems, SkillTree skillTree) {
+    public PlayerClass(Identifier id, String name, String description, List<ItemStack> startingItems, SkillTree skillTree, ItemStack iconItem) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.startingItems = startingItems;
         this.skillTree = skillTree;
+        this.iconItem = iconItem;
     }
 
     public Identifier getId() {
@@ -36,5 +38,7 @@ public class PlayerClass {
     public List<ItemStack> getStartingItems() {
         return startingItems;
     }
+
+    public ItemStack getIconItem() { return iconItem;}
 
 }

@@ -3,6 +3,7 @@ package net.elarisrpg.classes;
 import net.elarisrpg.classes.classskill.Skill;
 import net.elarisrpg.classes.classskill.SkillRow;
 import net.elarisrpg.classes.classskill.SkillTree;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.Identifier;
@@ -22,7 +23,8 @@ public class ElarisClasses {
                         new ItemStack(Items.IRON_SWORD),
                         new ItemStack(Items.IRON_CHESTPLATE)
                 ),
-                createWarriorSkillTree()
+                createWarriorSkillTree(),
+                new ItemStack(Items.IRON_SWORD)
         ));
 
         register(new PlayerClass(
@@ -33,7 +35,8 @@ public class ElarisClasses {
                         new ItemStack(Items.BLAZE_ROD),
                         new ItemStack(Items.LEATHER_HELMET)
                 ),
-                createElementalistSkillTree()
+                createElementalistSkillTree(),
+                new ItemStack(Items.BLAZE_ROD)
         ));
 
         register(new PlayerClass(
@@ -45,7 +48,8 @@ public class ElarisClasses {
                         new ItemStack(Items.LEATHER_CHESTPLATE),
                         new ItemStack(Items.ARROW, 16)
                 ),
-                createRangerSkillTree()
+                createRangerSkillTree(),
+                new ItemStack(Items.BOW)
         ));
 
         register(new PlayerClass(
@@ -56,7 +60,8 @@ public class ElarisClasses {
                         new ItemStack(Items.STONE_SWORD),
                         new ItemStack(Items.LEATHER_BOOTS)
                 ),
-                createRougeSkillTree()
+                createRougeSkillTree(),
+                new ItemStack(Items.LEATHER_BOOTS)
         ));
     }
 
