@@ -12,11 +12,8 @@ import net.elarisrpg.ElarisNetworking;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
-
-import java.util.List;
 
 public class ClassSelectionScreen extends LightweightGuiDescription {
 
@@ -61,10 +58,15 @@ public class ClassSelectionScreen extends LightweightGuiDescription {
         buttonBox = new WBox(Axis.VERTICAL);
         buttonBox.setSpacing(4);
 
-        // Needs fixing
         for (PlayerClass pc : ElarisClasses.getAll()) {
-            WButton clickable = new WButton(new ItemIcon(pc.getIconItem()));
-            buttonBox.add(clickable);
+            WButton clickable = new WButton(new ItemIcon(pc.getIconItem())) {
+                @Override
+                public void addTooltip(TooltipBuilder builder) {
+                    builder.add(Text.literal(pc.getName()), Text.literal(pc.getDescription()));
+                }
+            };
+            clickable.setOnClick(() -> selectClass(pc));
+            buttonBox.add(clickable, 20, 20);
         }
 
         contentRow.add(buttonBox);
@@ -86,12 +88,16 @@ public class ClassSelectionScreen extends LightweightGuiDescription {
         contentRow.add(rightBox);
 
         // Bottom bar for confirm button
+        String label = "Confirm";
+        int textWidth = MinecraftClient.getInstance().textRenderer.getWidth(label);
+        int desiredWidth = textWidth + 20;
+
         confirmButton.setOnClick(this::confirmSelection);
         confirmButton.setEnabled(false);
 
         WBox bottomBar = new WBox(Axis.HORIZONTAL);
-        bottomBar.setHorizontalAlignment(HorizontalAlignment.RIGHT);
-        bottomBar.add(confirmButton);
+        bottomBar.setHorizontalAlignment(HorizontalAlignment.LEFT);
+        bottomBar.add(confirmButton, desiredWidth, 20);
         root.add(bottomBar);
 
         root.validate(this);
