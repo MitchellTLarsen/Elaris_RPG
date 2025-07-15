@@ -8,10 +8,8 @@ import net.elarisrpg.client.gui.ClassSelectionScreen;
 import net.elarisrpg.client.gui.LevelScreen;
 import net.elarisrpg.client.gui.LibGuiHelper;
 import net.elarisrpg.client.overlay.XpBarOverlay;
-import net.elarisrpg.client.render.DamagePopup;
-import net.elarisrpg.client.render.DamagePopupManager;
-import net.elarisrpg.client.render.MobHealthRender;
-import net.elarisrpg.client.render.MobOutlineRenderer;
+import net.elarisrpg.client.render.*;
+import net.elarisrpg.client.render.lootbeams.LootBeamRendererHandler;
 import net.elarisrpg.data.PlayerData;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -34,6 +32,7 @@ public class ElarisRPGClient implements ClientModInitializer {
         MobHealthRender.register();
         MobOutlineRenderer.register();
         XpBarOverlay.register();
+        LootBeamRendererHandler.register();
 
         // ----------------------------------------------------------------------------------------------------
         // LISTEN FOR PLAYER DATA SYNC FROM SERVER
