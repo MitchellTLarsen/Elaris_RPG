@@ -2,11 +2,10 @@ package net.elarisrpg;
 
 // Imports from your mod
 
+import net.elarisrpg.client.DialogueManager;
 import net.elarisrpg.client.ElarisHud;
 import net.elarisrpg.client.HitMobTracker;
-import net.elarisrpg.client.gui.ClassSelectionScreen;
-import net.elarisrpg.client.gui.LevelScreen;
-import net.elarisrpg.client.gui.LibGuiHelper;
+import net.elarisrpg.client.gui.*;
 import net.elarisrpg.client.overlay.XpBarOverlay;
 import net.elarisrpg.client.render.*;
 import net.elarisrpg.client.render.lootbeams.LootBeamRendererHandler;
@@ -33,6 +32,15 @@ public class ElarisRPGClient implements ClientModInitializer {
         MobOutlineRenderer.register();
         XpBarOverlay.register();
         LootBeamRendererHandler.register();
+        ElarisNetworking.registerS2CPackets();
+
+        // Register villager look-at logic
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            var villager = DialogueManager.getActiveVillager();
+            if (villager != null && client.player != null) {
+                villager.getLookControl().lookAt(client.player, 30.0f, 30.0f);
+            }
+        });
 
         // ----------------------------------------------------------------------------------------------------
         // LISTEN FOR PLAYER DATA SYNC FROM SERVER
@@ -92,8 +100,8 @@ public class ElarisRPGClient implements ClientModInitializer {
 
             while (ElarisRPGKeyBinds.OPEN_SKILL_TREE.wasPressed()) {
                 if (client.player != null) {
-                    var playerData = net.elarisrpg.data.PlayerData.get(client.player);
-                    client.setScreen(new net.elarisrpg.client.gui.SkillTreeScreen(playerData));
+                    var playerData = PlayerData.get(client.player);
+                    client.setScreen(new SkillTreeScreen(playerData));
                 }
             }
 
@@ -125,15 +133,13 @@ public class ElarisRPGClient implements ClientModInitializer {
 
             if (classData.hasChosenClass()) {
                 triedToOpenClassScreen = false;
-                return;
-            }
-
-            if (!triedToOpenClassScreen && client.currentScreen == null) {
+            } else if (!triedToOpenClassScreen && client.currentScreen == null) {
                 client.setScreen(new LibGuiHelper(ClassSelectionScreen::new));
                 triedToOpenClassScreen = true;
             }
 
             DamagePopupManager.tick();
+
         });
 
         // ----------------------------------------------------------------------------------------------------

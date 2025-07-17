@@ -19,7 +19,7 @@
 			"net.elarisrpg.ElarisRPG"
 		],
 		"fabric-datagen": [
-			"net.elarisrpg.data.ElarisRPGDataGenerator"
+			"net.elarisrpg.ElarisRPGDataGenerator"
 		],
 		"client": [
 			"net.elarisrpg.ElarisRPGClient"
