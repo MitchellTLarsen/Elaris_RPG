@@ -9,6 +9,7 @@ public class ElarisRPGKeyBinds {
 
     public static KeyBinding OPEN_LEVEL_SCREEN;
     public static KeyBinding OPEN_SKILL_TREE;
+    public static KeyBinding WAVE_KEY;
 
     public static void register() {
         OPEN_LEVEL_SCREEN = KeyBindingHelper.registerKeyBinding(new KeyBinding(

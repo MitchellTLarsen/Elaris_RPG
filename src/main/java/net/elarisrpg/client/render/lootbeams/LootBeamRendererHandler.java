@@ -1,5 +1,6 @@
 package net.elarisrpg.client.render.lootbeams;
 
+import net.elarisrpg.util.RaycastUtils;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.math.MatrixStack;
@@ -18,12 +19,15 @@ public class LootBeamRendererHandler {
             var vertexConsumers = client.getBufferBuilders().getEntityVertexConsumers();
             MatrixStack matrices = context.matrixStack();
 
+            // Find the item the player is looking at, if any
+            assert client.player != null;
+            var lookedAtItem = RaycastUtils.findLookedAtItem(client.player, 8.0);
+
             for (var entity : world.getEntities()) {
                 if (entity instanceof ItemEntity itemEntity) {
 
                     ItemStack stack = itemEntity.getStack();
 
-                    // Determine rarity
                     LootRarity rarity = LootBeamManager.getRarity(stack);
                     var beamColor = LootBeamManager.getColorForItem(stack);
 
@@ -32,7 +36,6 @@ public class LootBeamRendererHandler {
                     double interpolatedZ = itemEntity.prevZ + (itemEntity.getZ() - itemEntity.prevZ) * tickDelta;
 
                     double groundY = Math.floor(interpolatedY);
-                    double height = (interpolatedY - groundY) + 5;
 
                     var camPos = context.camera().getPos();
 
@@ -56,11 +59,44 @@ public class LootBeamRendererHandler {
                             context.camera().getYaw()
                     );
 
+                    // --- RENDER NAME IF PLAYER LOOKING AT THIS ITEM ---
+                    if (lookedAtItem == itemEntity) {
+                        var textRenderer = client.textRenderer;
+                        String itemName = stack.getName().getString();
+
+                        matrices.push();
+
+                        // Position name above beam
+                        matrices.translate(0, 1, 0);
+
+                        // Rotate to face camera
+                        matrices.multiply(context.camera().getRotation());
+
+                        // Scale down text
+                        float scale = 0.025f;
+                        matrices.scale(-scale, -scale, scale);
+
+                        float textWidth = textRenderer.getWidth(itemName);
+                        textRenderer.draw(
+                                itemName,
+                                -textWidth / 2f,
+                                0,
+                                beamColor, // Color text to match rarity
+                                false,
+                                matrices.peek().getPositionMatrix(),
+                                vertexConsumers,
+                                net.minecraft.client.font.TextRenderer.TextLayerType.NORMAL,
+                                0,
+                                0x00F000F0
+                        );
+
+                        matrices.pop();
+                    }
+
                     matrices.pop();
                 }
             }
 
-            // Draw once after all items
             vertexConsumers.draw();
         });
     }
