@@ -1,5 +1,7 @@
 package net.elarisrpg.client;
 
+import net.elarisrpg.ElarisNetworking;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.command.argument.EntityAnchorArgumentType;
 import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -8,15 +10,18 @@ public class DialogueManager {
 
     private static VillagerEntity currentVillager = null;
 
-    public static void startDialogue(VillagerEntity villager, PlayerEntity player) {
+    public static void startDialogue(VillagerEntity villager) {
         currentVillager = villager;
-        villager.setAiDisabled(true);
-        villager.lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, player.getEyePos());
+        if (MinecraftClient.getInstance().player != null) {
+            ElarisNetworking.sendVillagerAiDisablePacket(currentVillager.getId());
+        }
     }
 
     public static void endDialogue() {
         if (currentVillager != null) {
-            currentVillager.setAiDisabled(false);
+            if (MinecraftClient.getInstance().player != null) {
+                ElarisNetworking.sendVillagerAiEnablePacket(currentVillager.getId());
+            }
             currentVillager = null;
         }
     }

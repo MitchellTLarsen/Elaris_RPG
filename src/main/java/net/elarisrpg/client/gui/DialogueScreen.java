@@ -53,6 +53,9 @@ public class DialogueScreen extends Screen {
     }
 
     @Override
+    public void renderBackground(DrawContext context) {}
+
+    @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         renderBackground(context);
 
@@ -61,7 +64,7 @@ public class DialogueScreen extends Screen {
         int boxY = this.height - boxHeight - margin;
 
         // Dialog background
-        context.fill(boxX, boxY, boxX + boxWidth, boxY + boxHeight, 0xCC000000);
+        context.fill(boxX, boxY, boxX + boxWidth, boxY + boxHeight, 0xBB000000);
 
         // NPC name
         int nameY = boxY + 10;

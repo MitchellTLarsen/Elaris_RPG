@@ -23,8 +23,9 @@ public abstract class VillagerInteractMixin {
             ElarisNetworking.lastVillagerInteracted = (VillagerEntity)(Object)this; // This cast works because we're in a VillagerEntity mixin
             ElarisNetworking.sendOpenDialogPacket(
                     (ServerPlayerEntity) player,
-                    "Greetings, traveler!",
-                    "Would you like to trade with me?"
+                    ((VillagerEntity)(Object)this).getId(),
+                    ((VillagerEntity)(Object)this).getName().getString(),  // dynamic name
+                    "villager_trade"
             );
         }
         cir.setReturnValue(ActionResult.SUCCESS);
