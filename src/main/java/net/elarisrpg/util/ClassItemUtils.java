@@ -9,7 +9,7 @@ public class ClassItemUtils {
     private static final String CLASS_ITEM_TAG = "ElarisClassItem";
 
     /**
-     * Removes all class-given items from the player, including:
+     * Removes all class-given slots from the player, including:
      * - Main inventory
      * - Armor slots
      * - Offhand

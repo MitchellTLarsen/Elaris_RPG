@@ -1,0 +1,7 @@
+{
+  "is_proxy": true,
+  "spell_ids": [
+    "wizards:fire_scorch",
+    "wizards:fire_breath"
+  ]
+}

@@ -41,4 +41,5 @@ public class PlayerClass {
 
     public ItemStack getIconItem() { return iconItem;}
 
+
 }

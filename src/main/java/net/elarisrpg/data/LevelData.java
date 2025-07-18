@@ -1,7 +1,9 @@
 package net.elarisrpg.data;
 
+import net.elarisrpg.classes.SpellCoreManager;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.server.network.ServerPlayerEntity;
 
 public class LevelData implements NbtSerializable {
 
@@ -43,6 +45,8 @@ public class LevelData implements NbtSerializable {
             xp -= xpToNextLevel();
             level++;
             skillPoints += 1;
+            System.out.println("[XP] Level up! Now level " + level + ", calling SpellCoreManager...");
+            SpellCoreManager.updateSpellCore((ServerPlayerEntity) player, level);
         }
     }
 

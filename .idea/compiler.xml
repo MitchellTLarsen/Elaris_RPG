@@ -1,6 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Gradle Imported" enabled="true">
+        <outputRelativeToContentRoot value="true" />
+        <option name="defaultObfuscationEnv" value="named:intermediary" />
+        <option name="inMapFileNamedIntermediary" value="C:\Users\mitch\.gradle\caches\fabric-loom\1.20.1\net.fabricmc.yarn.1_20_1.1.20.1+build.10-v2\mappings.tiny" />
+        <option name="outMapFileNamedIntermediary" value="C:\Users\mitch\OneDrive\Desktop\Dev\Elaris_RPG\build\loom-cache\mixin-map-net.fabricmc.yarn.1_20_1.1.20.1+build.10-v2.main.tiny" />
+        <option name="outRefMapFile" value="C:\Users\mitch\OneDrive\Desktop\Dev\Elaris_RPG\build\classes\java\main\elaris-refmap.json" />
+        <option name="quiet" value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.github.llamalad7/mixinextras-fabric/0.4.1/8d1a9e96afb990367fa1f904d17580d164da72e3/mixinextras-fabric-0.4.1.jar" />
+        </processorPath>
+        <module name="Elaris_RPG.main" />
+      </profile>
+    </annotationProcessing>
     <bytecodeTargetLevel target="17" />
   </component>
   <component name="JavacSettings">
