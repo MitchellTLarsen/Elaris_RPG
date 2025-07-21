@@ -2,7 +2,6 @@ package net.elarisrpg;
 
 // Imports from your mod
 
-import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationAccess;
 import net.elarisrpg.client.DialogueManager;
 import net.elarisrpg.client.ElarisHud;
 import net.elarisrpg.client.HitMobTracker;
@@ -16,9 +15,7 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
-import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationRegistry;
 
 public class ElarisRPGClient implements ClientModInitializer {
 

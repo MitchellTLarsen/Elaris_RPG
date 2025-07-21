@@ -1,9 +1,13 @@
 {
-  "is_proxy": true,
   "spell_ids": [
-    "wizards:fire_scorch",
     "wizards:fire_breath",
     "wizards:fire_meteor",
-    "wizards:fire_wall"
+    "wizards:fire_wall",
+    "wizards:fireball",
+    "wizards:frost_blizzard",
+    "wizards:frost_nova",
+    "wizards:frost_shard",
+    "wizards:frost_shield",
+    "wizards:frostbolt"
   ]
 }
