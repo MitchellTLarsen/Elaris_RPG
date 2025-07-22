@@ -1,13 +1,13 @@
 {
   "spell_ids": [
-    "wizards:fire_breath",
-    "wizards:fire_meteor",
-    "wizards:fire_wall",
-    "wizards:fireball",
-    "wizards:frost_blizzard",
-    "wizards:frost_nova",
-    "wizards:frost_shard",
-    "wizards:frost_shield",
-    "wizards:frostbolt"
+    "elarisrpg:fire_breath",
+    "elarisrpg:fire_meteor",
+    "elarisrpg:fire_wall",
+    "elarisrpg:fireball",
+    "elarisrpg:frost_blizzard",
+    "elarisrpg:frost_nova",
+    "elarisrpg:frost_shard",
+    "elarisrpg:frost_shield",
+    "elarisrpg:frostbolt"
   ]
 }

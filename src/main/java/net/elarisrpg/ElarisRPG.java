@@ -1,6 +1,8 @@
 package net.elarisrpg;
 
 import dev.emi.trinkets.TrinketSlot;
+import dev.onyxstudios.cca.api.v3.entity.EntityComponentFactoryRegistry;
+import dev.onyxstudios.cca.api.v3.entity.RespawnCopyStrategy;
 import net.elarisrpg.classes.SpellCoreManager;
 import net.elarisrpg.command.ResetClassCommand;
 import net.elarisrpg.command.ResetLevelCommand;
@@ -10,10 +12,12 @@ import net.elarisrpg.data.LevelData;
 import net.elarisrpg.data.PlayerData;
 import net.elarisrpg.item.ModItems;
 import net.elarisrpg.item.SpellCoreItem;
+import net.elarisrpg.quest.QuestManager;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.event.v1.ServerEntityCombatEvents;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.player.PlayerEntity;
@@ -31,6 +35,10 @@ public class ElarisRPG implements ModInitializer {
 	public void onInitialize() {
 
 		ModItems.registerModItems();
+
+		ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> {
+			QuestManager.remove(handler.player);
+		});
 
 		CommandRegistrationCallback.EVENT.register(
 				(dispatcher, registryAccess, environment) -> {

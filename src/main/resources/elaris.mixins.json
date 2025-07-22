@@ -9,7 +9,8 @@
 		"OverTheShoulderCameraMixin",
 		"PlayerEntityMixin",
 		"VillagerInteractMixin",
-		"SpellHotBarWidgetMixin"
+		"SpellHotBarWidgetMixin",
+		"HudRenderHelperMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

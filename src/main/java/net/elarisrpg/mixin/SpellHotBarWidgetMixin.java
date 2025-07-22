@@ -11,9 +11,12 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.util.Identifier;
 import net.spell_engine.SpellEngineMod;
+import net.spell_engine.client.gui.Drawable;
+import net.spell_engine.client.gui.HudKeyVisuals;
 import net.spell_engine.client.gui.HudRenderHelper;
 import net.spell_engine.internals.SpellRegistry;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -53,22 +56,12 @@ public class SpellHotBarWidgetMixin {
             }
         }
 
-//        HotbarComponent hotbar = PlayerComponents.HOTBAR.get(client.player);
-//        int slot = 0;
-//        for (Identifier id : spellIds) {
-//            if (slot >= 7) break;
-//            if (SpellRegistry.getSpell(id) != null) {
-//                hotbar.set(slot, id);
-//                slot++;
-//            }
-//        }
-
         // ⬇ Now render using assigned spells
         List<HudRenderHelper.SpellHotBarWidget.SpellViewModel> spells = viewModel.spells();
         if (spells.isEmpty()) return;
 
         renderSimpleHorizontalHud(context, screenWidth, screenHeight, spells);
-        //ci.cancel();
+        ci.cancel();
     }
 
     private static void extractSpellIdsFromItem(ItemStack stack, Set<Identifier> spells) {
@@ -86,57 +79,118 @@ public class SpellHotBarWidgetMixin {
         }
     }
 
+    /**
+     * @author
+     * @reason
+     */
+    @Overwrite
+    private static void drawKeybinding(DrawContext context, TextRenderer textRenderer,
+                                       HudRenderHelper.SpellHotBarWidget.KeyBindingViewModel keybinding,
+                                       int x, int y,
+                                       Drawable.Anchor horizontalAnchor, Drawable.Anchor verticalAnchor) {
+        if (keybinding.drawable() != null) {
+            keybinding.drawable().draw(context, x, y, horizontalAnchor, verticalAnchor);
+        } else {
+            String label = keybinding.label();
+            int width = textRenderer.getWidth(label);
+            int xOffset = switch (horizontalAnchor) {
+                case LEADING -> width / 2;
+                case TRAILING -> -width / 2;
+                case CENTER -> 0;
+            };
+            x += xOffset;
+
+            HudKeyVisuals.buttonLeading.draw(context, x - (width / 2), y, Drawable.Anchor.TRAILING, verticalAnchor);
+            HudKeyVisuals.buttonCenter.drawFlexibleWidth(context, x - (width / 2), y, width, verticalAnchor);
+            HudKeyVisuals.buttonTrailing.draw(context, x + (width / 2), y, Drawable.Anchor.LEADING, verticalAnchor);
+            context.drawCenteredTextWithShadow(textRenderer, label, x, y - 10, 0xFFFFFF);
+        }
+    }
+
+
     @Unique
     private static void renderSimpleHorizontalHud(DrawContext context, int screenWidth, int screenHeight, List<HudRenderHelper.SpellHotBarWidget.SpellViewModel> spells) {
         MinecraftClient client = MinecraftClient.getInstance();
         TextRenderer textRenderer = client.textRenderer;
 
-        int maxSlots = Math.min(spells.size(), 10);
-        int slotSize = 22;
+        Identifier WIDGETS_TEXTURE = new Identifier("textures/gui/widgets.png");
+        int slotWidth = 21;
+        int slotHeight = 22;
         int iconSize = 16;
-        int spacing = 4;
 
-        int totalWidth = maxSlots * (slotSize + spacing) - spacing;
+        int spacingBetweenGroups = 10;
+        int spacingWithinGroup = 0;
+
+        // Compute group widths
+        int groupWidth = 3 * slotWidth + 2 * spacingWithinGroup;
+        int middleSlotWidth = slotWidth;
+        int totalWidth = groupWidth * 2 + middleSlotWidth + spacingBetweenGroups * 2;
+
         int baseX = (screenWidth - totalWidth) / 2;
-        int baseY = screenHeight - 60; // Above hotbar
+        int baseY = screenHeight - 50;
 
-        for (int i = 0; i < maxSlots; i++) {
+        int[] slotXs = new int[7];
+        for (int i = 0; i < 7; i++) {
+            if (i < 3) {
+                slotXs[i] = baseX + i * (slotWidth + spacingWithinGroup);
+            } else if (i == 3) {
+                slotXs[i] = baseX + groupWidth + spacingBetweenGroups;
+            } else {
+                slotXs[i] = baseX + groupWidth + spacingBetweenGroups + middleSlotWidth + spacingBetweenGroups
+                        + (i - 4) * (slotWidth + spacingWithinGroup);
+            }
+        }
+
+        for (int i = 0; i < Math.min(spells.size(), 7); i++) {
             HudRenderHelper.SpellHotBarWidget.SpellViewModel spell = spells.get(i);
-            int x = baseX + i * (slotSize + spacing);
+            int x = slotXs[i];
             int y = baseY;
 
-            // Draw simple slot background (semi-transparent gray box)
-            context.fill(RenderLayer.getGuiOverlay(), x, y, x + slotSize, y + slotSize, 0x88000000);
+            // Styled background
+            context.drawTexture(WIDGETS_TEXTURE, x, y, 0, 0, slotWidth, slotHeight);
 
-            // Draw spell icon or item
-            int iconX = x + (slotSize - iconSize) / 2;
+            // Spell icon
+            int iconX = x + (slotWidth - iconSize) / 2;
             int iconY = y + 3;
             if (spell.iconId() != null) {
-                context.drawTexture(spell.iconId(), iconX, iconY, 0, 0, iconSize, iconSize, iconSize, iconSize);
+                context.drawTexture(spell.iconId(), iconX + 1, iconY, 0, 0, iconSize, iconSize, iconSize, iconSize);
             } else if (spell.itemStack() != null) {
                 context.drawItem(spell.itemStack(), iconX, iconY);
             }
 
-            // Cooldown overlay
+            // Cooldown
             if (spell.cooldown() > 0) {
                 int cooldownTop = iconY + (int) (iconSize * (1.0f - spell.cooldown()));
                 context.fill(RenderLayer.getGuiOverlay(), iconX, cooldownTop, iconX + iconSize, iconY + iconSize, 0x88000000);
             }
 
-            // Draw keybinding label (if any)
+            // Keybinding visual (styled buttons)
             var kb = spell.keybinding();
+            var mod = spell.modifier();
+            int keyX = x + (slotWidth / 2);
+            int keyY = y + slotHeight + 5;
+
             if (kb != null) {
                 context.getMatrices().push();
-                context.getMatrices().translate(0, 0, 200); // Draw above other UI
-                String label = kb.label();
-                int labelWidth = textRenderer.getWidth(label);
-                int labelX = x + (slotSize - labelWidth) / 2;
-                int labelY = y + slotSize - 9;
-                context.drawTextWithShadow(textRenderer, label, labelX, labelY, 0xFFFFFF);
+                context.getMatrices().translate(0, 0, 200);
+                if (mod != null) {
+                    int spacingBetweenKeys = 1;
+                    int modWidth = mod.width(textRenderer);
+                    int keyWidth = kb.width(textRenderer);
+                    int total = modWidth + keyWidth + spacingBetweenKeys;
+                    int left = keyX - (total / 2);
+
+                    drawKeybinding(context, textRenderer, mod, left, keyY, Drawable.Anchor.LEADING, Drawable.Anchor.TRAILING);
+                    drawKeybinding(context, textRenderer, kb, left + modWidth + spacingBetweenKeys, keyY, Drawable.Anchor.LEADING, Drawable.Anchor.TRAILING);
+                } else {
+                    drawKeybinding(context, textRenderer, kb, keyX, keyY, Drawable.Anchor.CENTER, Drawable.Anchor.TRAILING);
+                }
                 context.getMatrices().pop();
             }
         }
 
         context.setShaderColor(1F, 1F, 1F, 1F);
     }
+
+
 }
