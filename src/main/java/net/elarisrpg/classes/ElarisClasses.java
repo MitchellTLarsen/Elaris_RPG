@@ -3,9 +3,11 @@ package net.elarisrpg.classes;
 import net.elarisrpg.classes.classskill.Skill;
 import net.elarisrpg.classes.classskill.SkillRow;
 import net.elarisrpg.classes.classskill.SkillTree;
+import net.elarisrpg.item.ModItems;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 
 import java.util.*;
@@ -32,11 +34,11 @@ public class ElarisClasses {
                 "Elementalist",
                 "A spellcaster who wields elemental forces.",
                 List.of(
-                        new ItemStack(Items.BLAZE_ROD),
+                        new ItemStack(Registries.ITEM.get(new Identifier("wizards", "staff_fire"))),
                         new ItemStack(Items.LEATHER_HELMET)
                 ),
                 createElementalistSkillTree(),
-                new ItemStack(Items.BLAZE_ROD)
+                new ItemStack(Registries.ITEM.get(new Identifier("wizards", "staff_fire")))
         ));
 
         register(new PlayerClass(

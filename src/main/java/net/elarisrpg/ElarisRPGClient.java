@@ -13,6 +13,7 @@ import net.elarisrpg.data.PlayerData;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
@@ -27,10 +28,10 @@ public class ElarisRPGClient implements ClientModInitializer {
 
         // Register custom keybinds and rendering overlays
         ElarisRPGKeyBinds.register();
-        ElarisHud.register();
+        //ElarisHud.register();
         MobHealthRender.register();
-        MobOutlineRenderer.register();
-        XpBarOverlay.register();
+        //MobOutlineRenderer.register();
+        //XpBarOverlay.register();
         LootBeamRendererHandler.register();
         ElarisNetworking.registerS2CPackets();
 

@@ -12,8 +12,13 @@ import net.minecraft.item.BowItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
+import net.spell_engine.api.spell.SpellInfo;
+import net.spell_engine.client.input.SpellHotbar;
+import net.spell_engine.client.util.SpellRender;
 
 import java.util.Collections;
+import java.util.List;
 
 public class ElarisHud {
 
@@ -115,6 +120,7 @@ public class ElarisHud {
                     0xFFAA00,
                     false
             );
+
         });
     }
 }

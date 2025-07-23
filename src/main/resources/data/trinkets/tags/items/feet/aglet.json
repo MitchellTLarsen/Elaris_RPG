@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "elarisrpg:spell_core_level_1",
+    "elarisrpg:spell_core_level_5",
+    "elarisrpg:spell_core_level_10",
+    "elarisrpg:spell_core_level_15"
+  ]
+}
