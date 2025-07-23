@@ -4,26 +4,26 @@ import dev.emi.trinkets.TrinketSlot;
 import dev.onyxstudios.cca.api.v3.entity.EntityComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.entity.RespawnCopyStrategy;
 import net.elarisrpg.classes.SpellCoreManager;
-import net.elarisrpg.command.ResetClassCommand;
-import net.elarisrpg.command.ResetLevelCommand;
-import net.elarisrpg.command.SetClassCommand;
-import net.elarisrpg.command.SetLevelCommand;
+import net.elarisrpg.command.*;
 import net.elarisrpg.data.LevelData;
 import net.elarisrpg.data.PlayerData;
 import net.elarisrpg.item.ModItems;
 import net.elarisrpg.item.SpellCoreItem;
-import net.elarisrpg.quest.QuestManager;
+import net.elarisrpg.quest.*;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.event.v1.ServerEntityCombatEvents;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +35,7 @@ public class ElarisRPG implements ModInitializer {
 	public void onInitialize() {
 
 		ModItems.registerModItems();
+		QuestRegistry.init();
 
 		ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> {
 			QuestManager.remove(handler.player);
@@ -46,16 +47,44 @@ public class ElarisRPG implements ModInitializer {
 					ResetClassCommand.register(dispatcher);
 					SetLevelCommand.register(dispatcher);
 					SetClassCommand.register(dispatcher);
+					QuestCommands.register(dispatcher);
 				}
 		);
 
-		ServerEntityCombatEvents.AFTER_KILLED_OTHER_ENTITY.register((world, entity, killedEntity) -> {
-			if (entity instanceof PlayerEntity player) {
-				LevelData levelData = PlayerData.get(player).getLevelData();
-				System.out.println("[XP] Adding XP to " + player.getName().getString() + ": +" + 100);
-				levelData.addXp(player, 100);
+		ServerEntityCombatEvents.AFTER_KILLED_OTHER_ENTITY.register((world, attacker, killedEntity) -> {
+			if (!(attacker instanceof ServerPlayerEntity player)) return;
+
+			// XP gain
+			LevelData levelData = PlayerData.get(player).getLevelData();
+			System.out.println("[XP] Adding XP to " + player.getName().getString() + ": +100");
+			levelData.addXp(player, 100);
+
+			// Quest kill tracking
+			Identifier mobId = EntityType.getId(killedEntity.getType());
+			PlayerQuestData questData = QuestManager.get(player);
+
+			for (Quest quest : QuestRegistry.getAll()) {
+				Identifier questId = quest.getId();
+
+				// Only process active quests
+				if (!questData.getActiveQuests().contains(questId)) continue;
+
+				// Skip completed quests unless repeatable
+				if (quest.isComplete(player) && !quest.isRepeatable()) continue;
+
+				if (quest instanceof KillMobQuest killQuest) {
+					killQuest.onMobKilled(player, mobId);
+
+					if (killQuest.isComplete(player)) {
+						if (!questData.isCompleted(killQuest.getId()) || killQuest.isRepeatable()) {
+							System.out.println("[QUEST] Player " + player.getName().getString() + " completed quest " + killQuest.getId());
+							questData.completeQuest(killQuest.getId());
+						}
+					}
+				}
 			}
 		});
+
 
 		ServerPlayNetworking.registerGlobalReceiver(
 				ElarisNetworking.CHOOSE_CLASS_PACKET,

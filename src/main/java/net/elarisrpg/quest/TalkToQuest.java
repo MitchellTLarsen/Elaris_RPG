@@ -3,18 +3,12 @@ package net.elarisrpg.quest;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 
-public class TalkToQuest implements Quest {
-    private final Identifier id;
+public class TalkToQuest extends Quest {
     private final Identifier targetNpc;
 
-    public TalkToQuest(Identifier id, Identifier targetNpc) {
-        this.id = id;
+    public TalkToQuest(Identifier id, String title, Identifier targetNpc, boolean repeatable) {
+        super(id, title, repeatable);
         this.targetNpc = targetNpc;
-    }
-
-    @Override
-    public Identifier getId() {
-        return id;
     }
 
     @Override
@@ -22,7 +16,6 @@ public class TalkToQuest implements Quest {
         return QuestManager.get(player).hasTalkedToNpc(targetNpc);
     }
 
-    @Override
     public void onTalkTo(ServerPlayerEntity player, Identifier npcId) {
         if (npcId.equals(targetNpc)) {
             QuestManager.get(player).markNpcTalkedTo(npcId);
