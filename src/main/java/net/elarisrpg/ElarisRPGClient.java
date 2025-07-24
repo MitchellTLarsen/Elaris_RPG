@@ -2,21 +2,21 @@ package net.elarisrpg;
 
 // Imports from your mod
 
+import io.github.cottonmc.cotton.gui.client.CottonClientScreen;
 import net.elarisrpg.client.DialogueManager;
-import net.elarisrpg.client.ElarisHud;
 import net.elarisrpg.client.HitMobTracker;
 import net.elarisrpg.client.gui.*;
-import net.elarisrpg.client.overlay.XpBarOverlay;
 import net.elarisrpg.client.render.*;
 import net.elarisrpg.client.render.lootbeams.LootBeamRendererHandler;
 import net.elarisrpg.data.PlayerData;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
+import io.github.cottonmc.cotton.gui.client.LibGui;
 
 public class ElarisRPGClient implements ClientModInitializer {
 
@@ -91,18 +91,12 @@ public class ElarisRPGClient implements ClientModInitializer {
             // -----------------------------------------------------------
             // Process keybind to open/close Level Screen
             // -----------------------------------------------------------
-            while (ElarisRPGKeyBinds.OPEN_LEVEL_SCREEN.wasPressed()) {
-                if (client.currentScreen instanceof LibGuiHelper) {
-                    client.setScreen(null);
+            while (ElarisRPGKeyBinds.OPEN_CHARACTER_SCREEN.wasPressed()) {
+                if (client.currentScreen instanceof CottonClientScreen RPGScreen &&
+                        RPGScreen.getDescription() instanceof RPGScreen) {
+                    client.setScreen(null); // Close if already open
                 } else {
-                    client.setScreen(new LibGuiHelper(LevelScreen::new));
-                }
-            }
-
-            while (ElarisRPGKeyBinds.OPEN_SKILL_TREE.wasPressed()) {
-                if (client.player != null) {
-                    var playerData = PlayerData.get(client.player);
-                    client.setScreen(new SkillTreeScreen(playerData));
+                    MinecraftClient.getInstance().setScreen(new CottonClientScreen(new RPGScreen())); // Open new RPG screen
                 }
             }
 

@@ -123,6 +123,16 @@ public class ElarisRPG implements ModInitializer {
 					});
 				}
 		);
+		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
+			ServerPlayerEntity player = handler.player;
+			PlayerQuestData questData = QuestManager.get(player);
 
+			PacketByteBuf buf = QuestSyncS2CPacket.createBuf(
+					questData.getActiveQuests(),
+					questData.getCompletedQuests()
+			);
+
+			ServerPlayNetworking.send(player, ElarisNetworking.SYNC_QUESTS_PACKET, buf);
+		});
 	}
 }

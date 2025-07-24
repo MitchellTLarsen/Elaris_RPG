@@ -1,6 +1,3 @@
 {
-  "key.elaris.open_level_screen": "Open Level Screen",
-  "category.elaris": "Elaris RPG",
-  "key.elarisrpg.open_skill_tree": "Open Skill Tree",
-  "category.elarisrpg": "Elaris RPG",
-}
+  "key.elaris.open_character_screen": "Open Character Screen",
+  "category.elaris": "Elaris RPG"

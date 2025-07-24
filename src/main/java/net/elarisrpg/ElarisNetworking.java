@@ -3,6 +3,7 @@ package net.elarisrpg;
 import net.elarisrpg.client.DialogueManager;
 import net.elarisrpg.client.gui.DialogueScreen;
 import net.elarisrpg.dialogue.DialogueRegistry;
+import net.elarisrpg.quest.QuestSyncS2CPacket;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.command.argument.EntityAnchorArgumentType;
@@ -24,6 +25,8 @@ public class ElarisNetworking {
     public static final Identifier CHOOSE_CLASS_PACKET = new Identifier("elarisrpg", "choose_class");
 
     public static final Identifier OPEN_DIALOG_PACKET = new Identifier("elarisrpg", "open_dialog");
+
+    public static final Identifier SYNC_QUESTS_PACKET = new Identifier("elarisrpg", "sync_quests");
 
     public static VillagerEntity lastVillagerInteracted = null;
 
@@ -112,6 +115,9 @@ public class ElarisNetworking {
                     }
                 }
             });
+        });
+        ClientPlayNetworking.registerGlobalReceiver(SYNC_QUESTS_PACKET, (client, handler, buf, responseSender) -> {
+            QuestSyncS2CPacket.handle(buf);
         });
     }
 
